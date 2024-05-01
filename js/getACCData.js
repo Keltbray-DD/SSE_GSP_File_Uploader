@@ -76,12 +76,12 @@ async function updateStatusTextInput() {
     }
 
 async function populateFolderDropdown(folderArray,ProjectPin) {
-
+    console.log(folderArray)
     const dropdown = document.getElementById('input_folder');
     uploadfolders = folderArray.filter(item => {
         return item.folderPath.includes("WIP")})
     if(ProjectPin){
-        uploadfolders = folderArray.filter(item => {
+        uploadfolders = uploadfolders.filter(item => {
             return item.folderPath.includes(ProjectPin.value)})
     }
     // Check if dropdown element exists
@@ -102,6 +102,7 @@ async function populateFolderDropdown(folderArray,ProjectPin) {
             option.textContent = folder.folderPath;
             dropdown.appendChild(option);
         });
+        console.log(uploadfolders)
     } else {
         console.error('Dropdown element not found.');
     };
@@ -149,7 +150,8 @@ function generateDocName(){
     const varDocNumber_noNum = ProjectPin.value+"-"+Originator.value+"-"+vFunction.value+"-"+Spatial.value+"-"+Form.value+"-"+Discipline.value
     console.log(varDocNumber_noNum)
 
-    populateFolderDropdown(uploadfolders,ProjectPin)
+    console.log(deliverableFolders)
+    populateFolderDropdown(deliverableFolders,ProjectPin)
 
     const PartialMatch = filelist.filter(item => item.includes(varDocNumber_noNum));
 
@@ -654,6 +656,8 @@ async function getAllACCFolders(startfolder_list){
             await getNamingStandardID(deliverableFolders)
             //statusUpdate.innerHTML = `<p class="extracted-ids"> Naming Standard Extracted</p>`
             await getTemplateFolder(deliverableFolders)
+            uploadfolders = deliverableFolders.filter(item => {
+                return item.folderPath.includes("WIP")})
             //statusUpdate.innerHTML = `<p class="extracted-ids"> Template List Extracted</p>`
         } catch {
             console.log("Error: Geting folder list");
