@@ -8,10 +8,11 @@ const toolURL ="https://keltbray-dd.github.io/Template_File_Uploader/"
 
 let ProjectFiles = []
 let projectFolders
+let deliverableFolders =[]
 
-const uploadfolders = [
-    {folderName:"KELTBRAY - WIP",folderID:"urn%3Aadsk.wipemea%3Afs.folder%3Aco.wKI_cMWkRQGTUkAfxlaabQ"},
-    {folderName:"BBN - WIP",folderID:"urn:adsk.wipemea:fs.folder:co.NxjqFHVtRvaLgTpzPeFF2A"}
+let uploadfolders = [
+    //{folderName:"KELTBRAY - WIP",folderID:"urn%3Aadsk.wipemea%3Afs.folder%3Aco.wKI_cMWkRQGTUkAfxlaabQ"},
+    //{folderName:"BBN - WIP",folderID:"urn:adsk.wipemea:fs.folder:co.NxjqFHVtRvaLgTpzPeFF2A"}
 ]
 
 const StatesList = [
@@ -19,7 +20,7 @@ const StatesList = [
     //{ code: 'A5', description: 'Accepted For Construction',folder:"PUBLISHED" },
     //{ code: 'A6', description: 'Accepted Handover',folder:"PUBLISHED" },
     //{ code: 'A7', description: 'Accepted Operation and Maintain',folder:"PUBLISHED" },
-    { code: 'S0', description: 'Work in Progress',folder:"WIP" },
+    { code: 'S0', description: 'Work In Progress',folder:"WIP" },
     //{ code: 'S1', description: 'Suitable For Co-Ordination',folder:"SHARED" },
     //{ code: 'S2', description: 'Suitable For Information',folder:"SHARED" },
     //{ code: 'S3', description: 'Suitable Review & Comment',folder:"SHARED" },
@@ -28,13 +29,13 @@ const StatesList = [
     //{ code: 'S7', description: 'Suitable AIM Authorisation',folder:"NA" }
 ];
 
-const searchFolders =[
-    "urn:adsk.wipemea:fs.folder:co.fVQbMv6BQUefajn7evnmSw", // 0C.KELTBRAY - WIP
-"urn:adsk.wipemea:fs.folder:co.NxjqFHVtRvaLgTpzPeFF2A", // 0D.BBN - WIP
-"urn:adsk.wipemea:fs.folder:co.T1ockx3tRzCOfni80QuhzA", // 0E.SHARED
-"urn:adsk.wipemea:fs.folder:co.n8M-ILKySGeJWMKGO19FOg", // 0F.CLIENT_SHARED
-"urn:adsk.wipemea:fs.folder:co.dsMTe3uWRniqD2X0y4WEJw", // 0G.PUBLISHED
-"urn:adsk.wipemea:fs.folder:co.Q8t27AgsSiGqPr32Wjsmnw", // 0H.ARCHIVED
+let searchFolders =[
+    //"urn:adsk.wipemea:fs.folder:co.fVQbMv6BQUefajn7evnmSw", // 0C.KELTBRAY - WIP
+//"urn:adsk.wipemea:fs.folder:co.NxjqFHVtRvaLgTpzPeFF2A", // 0D.BBN - WIP
+//"urn:adsk.wipemea:fs.folder:co.T1ockx3tRzCOfni80QuhzA", // 0E.SHARED
+//"urn:adsk.wipemea:fs.folder:co.n8M-ILKySGeJWMKGO19FOg", // 0F.CLIENT_SHARED
+//"urn:adsk.wipemea:fs.folder:co.dsMTe3uWRniqD2X0y4WEJw", // 0G.PUBLISHED
+//"urn:adsk.wipemea:fs.folder:co.Q8t27AgsSiGqPr32Wjsmnw", // 0H.ARCHIVED
 ]
 const tooltips = [
     { value: "Project Pin", tooltip: "The ‘project pin’ identifier code indicates that a document is related to a specific project to control its placement and management within the project folder structure where more than one project identification number may be in use" },

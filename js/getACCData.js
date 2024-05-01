@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         await getfileslist()
         await getNamingStandard()
         await getTemplateFiles()
+        await populateFolderDropdown(deliverableFolders)
         getCustomDetailsData()
         populateClassificationDropdown(uniclassClassificationsArray)
         hideLoadingScreen();
@@ -29,8 +30,108 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 
-  // Call the gatherArrays function
+// Call the gatherArrays function
+populateStatusDropdown()
 
+
+
+async function updateRevisionTextInput() {
+    const dropdown = document.getElementById('input_folder');
+    const revisionInput = document.getElementById('input_RevisionsCode');
+    const selectedValue = dropdown.value;
+    //console.log(selectedValue)
+
+    // Check if a state is selected
+    if (selectedValue) {
+        // Get the description of the selected state
+        const folder = uploadfolders.find(obj => obj.folderID === selectedValue);
+
+        if(folder.folderName === "SHARED"){
+            document.getElementById('input_RevisionsCode').value = "P01"
+            uploadFolderID = selectedValue.folderID
+        }else {
+            document.getElementById('input_RevisionsCode').value = "P01.01"
+            uploadFolderID = selectedValue.folderID
+        }
+        // Update the text input with the selected description
+        ;
+    }
+    }
+
+async function updateStatusTextInput() {
+    const dropdown = document.getElementById('input_Status');
+    const selectedValue = dropdown.value;
+
+    // Check if a state is selected
+    if (selectedValue) {
+        // Get the description of the selected state
+        const description = StatesList.find(obj => obj.code === selectedValue);
+
+        // Update the text input with the selected description
+        document.getElementById('input_StatusDesc').value = description.description;
+    } else {
+        // If no state is selected, clear the text input
+        document.getElementById('input_StatusDesc').value = '';
+    }
+    }
+
+async function populateFolderDropdown(folderArray,ProjectPin) {
+
+    const dropdown = document.getElementById('input_folder');
+    uploadfolders = folderArray.filter(item => {
+        return item.folderPath.includes("WIP")})
+    if(ProjectPin){
+        uploadfolders = folderArray.filter(item => {
+            return item.folderPath.includes(ProjectPin.value)})
+    }
+    // Check if dropdown element exists
+    if (dropdown) {
+        // Clear existing options
+        dropdown.innerHTML = '';
+
+        // Add blank option
+        const blankOption = document.createElement('option');
+        blankOption.value = '';
+        blankOption.textContent = 'Select a folder...';
+        dropdown.appendChild(blankOption);
+
+        // Add states from iso19650States array
+        uploadfolders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder.folderID;
+            option.textContent = folder.folderPath;
+            dropdown.appendChild(option);
+        });
+    } else {
+        console.error('Dropdown element not found.');
+    };
+    }
+
+function populateStatusDropdown() {
+    document.addEventListener('DOMContentLoaded', function() {
+    const dropdown = document.getElementById('input_Status');
+    // Check if dropdown element exists
+    if (dropdown) {
+        // Clear existing options
+        dropdown.innerHTML = '';
+
+        // Add blank option
+        const blankOption = document.createElement('option');
+        blankOption.value = '';
+        blankOption.textContent = 'Select a state...';
+        dropdown.appendChild(blankOption);
+
+        // Add states from iso19650States array
+        StatesList.forEach(state => {
+            const option = document.createElement('option');
+            option.value = state.code;
+            option.textContent = state.code;
+            dropdown.appendChild(option);
+        });
+    } else {
+        console.error('Dropdown element not found.');
+    }});
+}
 
 function generateDocName(){
     ProjectPin = document.querySelector('#ProjectPin_input')
@@ -47,6 +148,8 @@ function generateDocName(){
     console.log(Discipline.value)
     const varDocNumber_noNum = ProjectPin.value+"-"+Originator.value+"-"+vFunction.value+"-"+Spatial.value+"-"+Form.value+"-"+Discipline.value
     console.log(varDocNumber_noNum)
+
+    populateFolderDropdown(uploadfolders,ProjectPin)
 
     const PartialMatch = filelist.filter(item => item.includes(varDocNumber_noNum));
 
@@ -68,14 +171,14 @@ function generateDocName(){
         const nextNumber = maxNumber + 1;
 
         // Pad the next number with zeros and set the fixed length to 6
-        const paddedNextNumber = String(nextNumber).padStart(6, '0');
+        const paddedNextNumber = String(nextNumber).padStart(4, '0');
 
         console.log('Next number with padded zeros and fixed length 6:', paddedNextNumber);
 
         newNumber = paddedNextNumber
     } else {
         console.log(`No partial match '${varDocNumber_noNum}' found in the array.`);
-        newNumber = "000001"
+        newNumber = "0001"
     }
 
     const varDocNumber_Full = varDocNumber_noNum+"-"+newNumber
@@ -237,11 +340,11 @@ async function getfileslist() {
         console.log("Error: Getting Access Token");
     }
     //console.log("Access Token: ", access_token);
-
+    searchFolders = deliverableFolders
     try {
-        for (const folderID of searchFolders) {
+        for (const folder of searchFolders) {
             try {
-                filelist_temp = await getfolderItems(folderID, access_token, projectID);
+                filelist_temp = await getfolderItems(folder.folderID, access_token, projectID);
 
             } catch (error) {
                 console.error("Error getting folder items:", error);
@@ -539,7 +642,7 @@ async function getAllACCFolders(startfolder_list){
         }
         try {
             getRate = 0;
-            deliverableFolders = []
+            
             folderList_Main = []
             //statusUpdate.innerHTML = `<p class="extracted-ids"> Start Folder Found</p>`
             await getFolderList(access_token_read,startfolder_list)
