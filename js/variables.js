@@ -4,7 +4,7 @@ const hubID= "b.24d2d632-e01b-4ca0-b988-385be827cb04"
 const bucketKey = "wip.dm.emea.2"
 let defaultFolder //= "urn:adsk.wipemea:fs.folder:co.fVQbMv6BQUefajn7evnmSw" // KELTBRAY - WIP Folder
 let templateFolderID //= "urn:adsk.wipemea:fs.folder:co.2bLO3HWeQmq5d_oMM7dVuA" // APPROVED_TEMPLATES Folder
-const toolURL ="https://keltbray-dd.github.io/Template_File_Uploader/"
+const toolURL ="https://keltbray-dd.github.io/SSE_GSP_File_Uploader/"
 
 let ProjectFiles = []
 let projectFolders
