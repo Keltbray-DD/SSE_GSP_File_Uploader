@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     loadingScreen = document.getElementById('loadingScreen');
+    statusUpdateLoading = document.getElementById('statusUpdateLoading');
     // Show the loading screen
     function showLoadingScreen() {
         loadingScreen.style.display = 'flex';
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     gatherArrays();
 })
 
-
+let getRate = 0
 // Call the gatherArrays function
 populateStatusDropdown()
 
@@ -235,6 +236,7 @@ async function getNamingStandard() {
     //console.log("Access Token: ", access_token);
 
     try {
+        statusUpdateLoading.textContent = "Getting Naming Standard";
         namingstandard = await getNamingStandardforproject(access_token,namingstandardID,projectID)
 
     } catch (error) {
@@ -347,7 +349,10 @@ async function getfileslist() {
         for (const folder of searchFolders) {
             try {
                 filelist_temp = await getfolderItems(folder.folderID, access_token, projectID);
-
+                
+                console.log("Folder searched",folder.folderPath)
+                statusUpdateLoading.textContent = "Folder searched: "+folder.folderPath+"..."
+                await delay(100)
             } catch (error) {
                 console.error("Error getting folder items:", error);
             }
@@ -357,7 +362,7 @@ async function getfileslist() {
     } catch (error) {
         console.error("Error iterating through searchFolders:", error);
     }
-    console.log(filelist)
+    console.log("File List",filelist)
     }
 
 async function getAccessToken(scopeInput){
@@ -450,6 +455,8 @@ async function getfolderItems(folder_id,AccessToken,project_id){
         .then(response => response.json())
         .then(data => {
             const JSONdata = data
+            getRate++
+            console.log("getRate",getRate)
         //console.log(JSONdata)
         //console.log(JSONdata.uploadKey)
         //console.log(JSONdata.urls)
@@ -648,8 +655,6 @@ async function getAllACCFolders(startfolder_list){
             folderList_Main = []
             //statusUpdate.innerHTML = `<p class="extracted-ids"> Start Folder Found</p>`
             await getFolderList(access_token_read,startfolder_list)
-            //console.log(folderList_temp)
-            //convertToArray(foldersMIDP)
             //statusUpdate.innerHTML = `<p class="extracted-ids"> Folder List Created</p>`
             console.log("Full Folder List",folderList_Main)
             console.log("Deliverable Folders:",deliverableFolders)
@@ -669,7 +674,7 @@ async function getAllACCFolders(startfolder_list){
     }}
 
 async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
-    try {
+
         // Array of folder names to skip
         const foldersToSkip = ["0A.INCOMING","Z.PROJECT_ADMIN","ZZ.SHADOW_PROJECT"];
         const deliverableFoldersToAdd = ["APPROVED_TEMPLATES","WIP","0E.SHARED","0F.CLIENT_SHARED","0F.SHARED_TO_CLIENT", "0G.PUBLISHED", "0H.ARCHIVED"]
@@ -680,10 +685,11 @@ async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
                 throw new Error("Error getting folder items: Invalid folderList data");
             }
             if (getRate >= 290) {
-                console.log("Waiting for 10 Seconds..."); // Displaying the message for a 60-second delay
-                await delay(20000); // Delaying for 60 seconds
+                console.log("Waiting for 5 Seconds..."); // Displaying the message for a 60-second delay
+                getRate = 0
+                await delay(5000); // Delaying for 60 seconds
             } else {
-                const promises = folderList.data.map(async folder => {
+                for (const folder of folderList.data) {
                     if (folder.type === 'folders') {
                         const folderID = "folderID: " + folder.id;
                         folderNameLocal = "folderPath: " + folder.attributes.name;
@@ -697,6 +703,7 @@ async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
                         }
                         //statusUpdate.innerHTML = `<p class="extracted-ids"> Added folder: ${fullPath}</p>`
                         console.log("Added folder:", folderID, fullPath);
+                        statusUpdateLoading.textContent = "Folder found: "+fullPath+"..."
                         // Check if the folderName contains any of the names in foldersToSkip array
                         if (!foldersToSkip.some(skipName => folderNameLocal.includes(skipName))) {
                             await getFolderList(AccessToken, [{ folderID: folder.id, folderPath: fullPath }], fullPath);
@@ -704,20 +711,20 @@ async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
                             console.log("Skipping getFolderList for folder:", folderID, fullPath);
                         }
                     }
-                });
-                await Promise.all(promises);
+                }
             }
-        }
-    } catch (error) {
-        console.error(error.message);
-    }
+            }
 
-    }
+
+                //await Promise.all(promises);
+            }
+        
+    
 
 async function getNamingStandardID(folderArray){
     wipFolderID = folderArray.filter(item => {
         return item.folderPath.includes("0C.KELTBRAY/WIP")})
-    console.log(wipFolderID[0]);
+    console.log("Keltrbay WIP Folder for NS",wipFolderID[0]);
     defaultFolder = wipFolderID[0].folderID
     returnData = await getFolderDetails(accessTokenDataRead,projectID,wipFolderID[0].folderID)
     
@@ -732,7 +739,9 @@ async function getTemplateFolder(folderArray){
     templateFolderID = folderArray.filter(item => {
         return item.folderPath === "0B.GENERAL/APPROVED_TEMPLATES"})[0].folderID
     console.log(templateFolderID);
+    statusUpdateLoading.textContent = "Getting Template files..."
     await getTemplateFiles()
+
     
     return 
 }
