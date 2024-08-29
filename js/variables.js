@@ -1,19 +1,11 @@
 const projectID = "2e6449f9-ce25-4a9c-8835-444cb5ea03bf";
-let namingstandardID //="ab4856cc-1546-5a4b-8ff4-99e41fc97170"
 const hubID= "b.24d2d632-e01b-4ca0-b988-385be827cb04"
 const bucketKey = "wip.dm.emea.2"
-let defaultFolder //= "urn:adsk.wipemea:fs.folder:co.fVQbMv6BQUefajn7evnmSw" // KELTBRAY - WIP Folder
-let templateFolderID //= "urn:adsk.wipemea:fs.folder:co.2bLO3HWeQmq5d_oMM7dVuA" // APPROVED_TEMPLATES Folder
 const toolURL ="https://keltbray-dd.github.io/SSE_GSP_File_Uploader/"
 
 let ProjectFiles = []
 let projectFolders
 let deliverableFolders =[]
-
-let uploadfolders = [
-    //{folderName:"KELTBRAY - WIP",folderID:"urn%3Aadsk.wipemea%3Afs.folder%3Aco.wKI_cMWkRQGTUkAfxlaabQ"},
-    //{folderName:"BBN - WIP",folderID:"urn:adsk.wipemea:fs.folder:co.NxjqFHVtRvaLgTpzPeFF2A"}
-]
 
 const StatesList = [
     //{ code: 'A4', description: 'Accepted Design',folder:"PUBLISHED" },
@@ -29,14 +21,6 @@ const StatesList = [
     //{ code: 'S7', description: 'Suitable AIM Authorisation',folder:"NA" }
 ];
 
-let searchFolders =[
-    //"urn:adsk.wipemea:fs.folder:co.fVQbMv6BQUefajn7evnmSw", // 0C.KELTBRAY - WIP
-//"urn:adsk.wipemea:fs.folder:co.NxjqFHVtRvaLgTpzPeFF2A", // 0D.BBN - WIP
-//"urn:adsk.wipemea:fs.folder:co.T1ockx3tRzCOfni80QuhzA", // 0E.SHARED
-//"urn:adsk.wipemea:fs.folder:co.n8M-ILKySGeJWMKGO19FOg", // 0F.CLIENT_SHARED
-//"urn:adsk.wipemea:fs.folder:co.dsMTe3uWRniqD2X0y4WEJw", // 0G.PUBLISHED
-//"urn:adsk.wipemea:fs.folder:co.Q8t27AgsSiGqPr32Wjsmnw", // 0H.ARCHIVED
-]
 const tooltips = [
     { value: "Project Pin", tooltip: "The ‘project pin’ identifier code indicates that a document is related to a specific project to control its placement and management within the project folder structure where more than one project identification number may be in use" },
     { value: "Originator", tooltip: "The ‘originator’ (company) identifier code serves to identify which company has created a document. They are ultimately accountable for the document and liable for its content through the lifecycle of the project" },
@@ -46,12 +30,10 @@ const tooltips = [
     { value: "Discipline", tooltip: "The ‘discipline’ (Task Team) identifier code gives a user information on who the responsible team/discipline is, who have generated the document’ content and are accountable for it" }
 ];
 
-
 var AccessToken_DataCreate
 var AccessToken_DataRead
 var AccessToken_BucketCreate
 
-let namingstandard;
 let filelist =[];
 let arrayprojectPin=[];
 let arrayOriginator=[];
@@ -59,12 +41,13 @@ let arrayfunction=[];
 let arraySpatial=[];
 let arrayForm=[];
 let arrayDiscipline=[];
+let customAttributes =[]
+let templatesList =[];
+
 let objectKeyShort
 let objectKeyLong
 let fileData
 let filename
-let customAttributes =[]
-let templates = []
 let droppedfile
 let uploadfile
 
@@ -76,12 +59,13 @@ let ClassificationID
 let StatusCodeDescriptionID
 let FileDescriptionID
 let StateID
+let namingstandardID
 
+let namingstandard;
 let fileURN
 let fileExtension
 let progressCount = 0
 let uploadbutton
-let templatesList =[];
 let originSelectionDropdown
 let templateDropdwon
 let copyURN
@@ -116,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // You can perform any actions you need here
         if(originSelectionDropdown.value === "Template Folder"){
             templateDropdwon.style.display = 'block'
-        }else if(originSelectionDropdown.value === "User PC"){
+        }else if(originSelectionDropdown.value === "Your computer"){
             droparea.style.display = 'block'
         }
       });

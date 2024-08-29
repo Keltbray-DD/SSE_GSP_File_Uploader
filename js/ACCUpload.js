@@ -9,7 +9,6 @@ function runUpload(){
       const input_RevisionsCode = document.getElementById('input_RevisionsCode').value;
       const input_RevisionDescription = document.getElementById('input_RevisionDescription').value;
       const input_Status = document.getElementById('input_Status').value;
-      const input_State = document.getElementById('input_State').value;
       const input_file_template = document.getElementById('input_file_template').value;
       const input_file_origin = document.getElementById('input_file_origin').value;
       const fileInput = document.getElementById('fileInput');
@@ -56,11 +55,6 @@ function runUpload(){
           alert('Please select a Status');
           return; // Exit the function
       }
-      if (!input_State.trim()) {
-          // Alert the user if the username field is empty
-          alert('Please select a State');
-          return; // Exit the function
-      }
       if (!input_file_origin.trim()) {
           // Alert the user if the username field is empty
           alert('Please select an upload origin');
@@ -72,7 +66,7 @@ function runUpload(){
         alert('Please select a Template');
         return; // Exit the function
     }
-    if(originSelectionDropdown.value === "User PC" ){
+    if(originSelectionDropdown.value === "Your computer" ){
 
         if(droppedfile){
             console.log(droppedfile)
@@ -107,7 +101,7 @@ function runUpload(){
         const selectedOptionText = selectedOption.innerText;
         filename = sessionStorage.getItem('generatedName')+"."+getFileExtension(selectedOptionText)
 
-    }else if(originSelectionDropdown.value === "User PC"){
+    }else if(originSelectionDropdown.value === "Your computer"){
 
         let file
         if(droppedfile){
@@ -267,7 +261,7 @@ async function uploadtoSignURL(uploadURL) {
                 //'Authorization': 'Bearer ' + AccessToken,
                 "Content-Type": 'application/octet-stream'
             };
-            if(originSelectionDropdown.value === "User PC"){
+            if(originSelectionDropdown.value === "Your computer"){
                 file = uploadfile
 
             }else if(originSelectionDropdown.value === "Template Folder"){
@@ -534,7 +528,7 @@ async function getItemDetails(AccessToken){
     }
 
 async function postCustomItemDetails(AccessToken){
-    if($("#input_Classification").val()==="Select a classification"){
+    if($("#input_Classification").val()===""){
         classValue = ""
     }else{
         classValue = $("#input_Classification").val()
@@ -563,11 +557,6 @@ async function postCustomItemDetails(AccessToken){
         },
         {
              // Status Description
-          "id": StatusCodeDescriptionID.id,
-          "value": $("#input_StatusDesc").val()
-        },
-        {
-             // Status Description
           "id": ClassificationID.id,
           "value": classValue
         },
@@ -575,11 +564,6 @@ async function postCustomItemDetails(AccessToken){
              // Status Description
           "id": FileDescriptionID.id,
           "value": $("#input_Description").val()
-        },
-        {
-             // Status Description
-          "id": StateID.id,
-          "value": $("#input_State").val()
         }
       ];
 

@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         await getTemplateFiles()
         await populateFolderDropdown(deliverableFolders)
         getCustomDetailsData()
-        populateClassificationDropdown(uniclassClassificationsArray)
+        populateClassificationDropdown()
         hideLoadingScreen();
  
     }
@@ -68,8 +68,6 @@ async function updateStatusTextInput() {
         // Get the description of the selected state
         const description = StatesList.find(obj => obj.code === selectedValue);
 
-        // Update the text input with the selected description
-        document.getElementById('input_StatusDesc').value = description.description;
     } else {
         // If no state is selected, clear the text input
         document.getElementById('input_StatusDesc').value = '';
@@ -348,11 +346,18 @@ async function getfileslist() {
     try {
         for (const folder of searchFolders) {
             try {
-                filelist_temp = await getfolderItems(folder.folderID, access_token, projectID);
+                if (getRate >= 290) {
+                    console.log("Waiting for 5 Seconds..."); // Displaying the message for a 60-second delay
+                    getRate = 0
+                    await delay(5000); // Delaying for 60 seconds
+                }else{
+                    filelist_temp = await getfolderItems(folder.folderID, access_token, projectID);
                 
-                console.log("Folder searched",folder.folderPath)
-                statusUpdateLoading.textContent = "Folder searched: "+folder.folderPath+"..."
-                await delay(100)
+                    console.log("Folder searched",folder.folderPath)
+                    statusUpdateLoading.textContent = "Folder searched: "+folder.folderPath+"..."
+
+                }
+                
             } catch (error) {
                 console.error("Error getting folder items:", error);
             }
@@ -677,7 +682,7 @@ async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
 
         // Array of folder names to skip
         const foldersToSkip = ["0A.INCOMING","Z.PROJECT_ADMIN","ZZ.SHADOW_PROJECT"];
-        const deliverableFoldersToAdd = ["APPROVED_TEMPLATES","WIP","0E.SHARED","0F.CLIENT_SHARED","0F.SHARED_TO_CLIENT", "0G.PUBLISHED", "0H.ARCHIVED"]
+        const deliverableFoldersToAdd = ["APPROVED_TEMPLATES","0E.SHARED","0F.CLIENT_SHARED","0F.SHARED_TO_CLIENT", "0G.PUBLISHED", "0H.ARCHIVED"]
 
         for (const startFolder of startFolderList) {
             const folderList = await getfolderItems(startFolder.folderID, AccessToken, projectID);
@@ -700,6 +705,11 @@ async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
                             if(folderNameLocal.includes("APPROVED_TEMPLATES")){
                                 templateFolderID = folder.id
                             }
+
+                        }
+                        
+                        if(fullPath.includes("0C.WIP/")){
+                            deliverableFolders.push({ folderID: folder.id, folderPath: fullPath,folderNameEnd: folder.attributes.name });
                         }
                         //statusUpdate.innerHTML = `<p class="extracted-ids"> Added folder: ${fullPath}</p>`
                         console.log("Added folder:", folderID, fullPath);
@@ -723,7 +733,7 @@ async function getFolderList(AccessToken, startFolderList, parentFolderPath) {
 
 async function getNamingStandardID(folderArray){
     wipFolderID = folderArray.filter(item => {
-        return item.folderPath.includes("0C.KELTBRAY/WIP")})
+        return item.folderPath.includes("0C.WIP")})
     console.log("Keltrbay WIP Folder for NS",wipFolderID[0]);
     defaultFolder = wipFolderID[0].folderID
     returnData = await getFolderDetails(accessTokenDataRead,projectID,wipFolderID[0].folderID)
@@ -823,23 +833,54 @@ function delay(ms) {
 
 
 // Function to populate dropdown with data
-function populateClassificationDropdown(data) {
-    const dropdown = document.getElementById('input_Classification');
+function populateClassificationDropdown() {
+    data = uniclassClassificationsArray
+    const searchInput = document.getElementById('input_Classification');
+    const selectOptions = document.getElementById('selectOptions');
 
-    // Clear existing options
-    dropdown.innerHTML = '';
 
-    // Add a default option
-    const defaultOption = document.createElement('option');
-    defaultOption.text = 'Select a classification';
-    dropdown.add(defaultOption);
+    // Function to create the dropdown options
+    function populateOptions(items) {
+        selectOptions.innerHTML = "";
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.textContent = item.code+" - "+item.title;
+            div.addEventListener('click', () => {
+                searchInput.textContent = item.code+" - "+item.title;
+                searchInput.value = item.code;
+                selectOptions.innerHTML = "";
+            });
+            selectOptions.appendChild(div);
+        });
+    }
 
-    // Add options for each item in the data array
-    data.forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.code;
-        option.text = item.code+" - "+item.title;
-        dropdown.add(option);
+    // Populate the dropdown with all options initially
+    populateOptions(data);
+
+    // Add event listener to filter the dropdown based on search input
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase();
+        const filteredOptions = data.filter(option => {
+            // Check if any field in the object contains the search term
+            return Object.values(option).some(value =>
+                value.toString().toLowerCase().includes(filter)
+            );
+        });
+        populateOptions(filteredOptions);
+        selectOptions.style.display = 'block'; // Show the dropdown when input is typed
+    });
+
+    // Close the dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !selectOptions.contains(e.target)) {
+            selectOptions.innerHTML = "";
+        }
+    });
+
+    // Open dropdown on input click
+    searchInput.addEventListener('click', function() {
+        populateOptions(data);
+        selectOptions.style.display = 'block'; // Show the dropdown when input is typed
     });
 }
 
