@@ -361,6 +361,7 @@ async function getfileslist() {
             } catch (error) {
                 console.error("Error getting folder items:", error);
             }
+            
             filelist = filelist.concat(filelist_temp.data.map(item => item.attributes.displayName))
         }
 
