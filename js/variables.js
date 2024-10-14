@@ -5,7 +5,7 @@ const bucketKey = "wip.dm.emea.2"
 //const toolURL = "http://127.0.0.1:3002/index.html";
 let toolURL
 const AAFLink = `https://keltbray-dd.github.io/ACC_User_Access_Form/?id=b.${projectID}`
-const REFRESH_INTERVAL_DAYS = 14;
+const REFRESH_INTERVAL_DAYS = 2;
 
 let ProjectFiles = [];
 let projectFolders;
